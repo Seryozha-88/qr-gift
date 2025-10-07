@@ -6,13 +6,18 @@ const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+
+// Health check endpoint for Cloud Run
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
 
 // Create necessary directories
 ['uploads/images', 'uploads/audio', 'data'].forEach(dir => {
@@ -141,7 +146,8 @@ app.get('/api/pages', (req, res) => {
   res.json({ success: true, pages: pageList });
 });
 
-app.listen(PORT, () => {
-  console.log(`QR Gift server running on http://localhost:${PORT}`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`QR Gift server running on port ${PORT}`);
+  console.log(`Admin panel: /admin`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
