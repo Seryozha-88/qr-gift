@@ -31,7 +31,6 @@ document.getElementById('audio').addEventListener('change', function(e) {
   const progress = document.getElementById('audioUploadProgress');
   const file = e.target.files[0];
   
-<<<<<<< HEAD
   if (!file) {
     preview.innerHTML = '';
     progress.style.display = 'none';
@@ -46,20 +45,11 @@ document.getElementById('audio').addEventListener('change', function(e) {
     preview.innerHTML = `<audio controls><source src="${url}" type="audio/mpeg"></audio>`;
     progress.style.display = 'none';
   }, 500);
-=======
-  if (file) {
-    const url = URL.createObjectURL(file);
-    preview.innerHTML = `<audio controls><source src="${url}" type="audio/mpeg"></audio>`;
-  } else {
-    preview.innerHTML = '';
-  }
->>>>>>> 71bb75f7602708e367765ef468c0b40b854e2aae
 });
 
 // Submit form
 document.getElementById('giftForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-<<<<<<< HEAD
   const formData = new FormData(e.target);
 
   // Show loading state
@@ -71,11 +61,6 @@ document.getElementById('giftForm').addEventListener('submit', async function(e)
   btnText.style.display = 'none';
   loadingSpinner.style.display = 'flex';
 
-=======
-  
-  const formData = new FormData(this);
-  
->>>>>>> 71bb75f7602708e367765ef468c0b40b854e2aae
   try {
     const response = await fetch('/api/create', {
       method: 'POST',
@@ -96,7 +81,6 @@ document.getElementById('giftForm').addEventListener('submit', async function(e)
     } else {
       alert('Error creating page: ' + result.error);
     }
-<<<<<<< HEAD
   } catch (err) {
     alert('Error: ' + err.message);
   } finally {
@@ -104,10 +88,6 @@ document.getElementById('giftForm').addEventListener('submit', async function(e)
     submitBtn.disabled = false;
     btnText.style.display = 'inline';
     loadingSpinner.style.display = 'none';
-=======
-  } catch (error) {
-    alert('Error: ' + error.message);
->>>>>>> 71bb75f7602708e367765ef468c0b40b854e2aae
   }
 });
 
