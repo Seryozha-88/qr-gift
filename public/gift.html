@@ -9,24 +9,31 @@
 <body>
   <div class="gift-container">
     <div class="gift-content">
+      <h1>🎁 A Gift For You!</h1>
+      
       <div id="loading" class="loading">Loading your gift...</div>
-
+      
       <div id="giftData" style="display: none;">
-        <h1 id="giftTitle" class="gift-title"></h1>
+        <div id="textContent" class="text-content"></div>
+        
         <div id="imageContainer" class="image-container" style="display: none;">
           <img id="giftImage" src="" alt="Gift Image">
         </div>
-        <div id="textContent" class="text-content"></div>
+        
         <div id="audioContainer" class="audio-container" style="display: none;">
           <audio id="giftAudio" controls>
             <source id="audioSource" src="" type="audio/mpeg">
+            Your browser does not support the audio element.
           </audio>
         </div>
       </div>
 
-      <div id="error" class="error" style="display: none;">Gift page not found 😢</div>
+      <div id="error" class="error" style="display: none;">
+        Gift page not found 😢
+      </div>
     </div>
   </div>
+
   <script src="/gift.js"></script>
 </body>
 </html>
