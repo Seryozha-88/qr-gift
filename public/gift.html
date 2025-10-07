@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Gift 🎁</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="gift-container">
+    <div class="gift-content">
+      <h1>🎁 A Gift For You!</h1>
+      
+      <div id="loading" class="loading">Loading your gift...</div>
+      
+      <div id="giftData" style="display: none;">
+        <div id="textContent" class="text-content"></div>
+        
+        <div id="imageContainer" class="image-container" style="display: none;">
+          <img id="giftImage" src="" alt="Gift Image">
+        </div>
+        
+        <div id="audioContainer" class="audio-container" style="display: none;">
+          <audio id="giftAudio" controls>
+            <source id="audioSource" src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
+
+      <div id="error" class="error" style="display: none;">
+        Gift page not found 😢
+      </div>
+    </div>
+  </div>
+
+  <script src="/gift.js"></script>
+</body>
+</html>

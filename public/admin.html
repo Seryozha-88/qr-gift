@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - QR Gift Generator</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Admin Panel</h1>
+    <a href="/" class="back-link">← Back to Home</a>
+
+    <div class="form-container">
+      <h2>Create New Gift Page</h2>
+      <form id="giftForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="text">Message Text:</label>
+          <textarea id="text" name="text" rows="4" placeholder="Enter your gift message here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Upload Image:</label>
+          <input type="file" id="image" name="image" accept="image/*">
+          <div id="imagePreview" class="preview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="audio">Upload Audio (MP3):</label>
+          <input type="file" id="audio" name="audio" accept="audio/*">
+          <div id="audioPreview" class="preview"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generate Gift Page & QR Code</button>
+      </form>
+    </div>
+
+    <div id="result" class="result" style="display: none;">
+      <h2>✅ Gift Page Created!</h2>
+      <div class="result-content">
+        <div class="qr-container">
+          <img id="qrCode" src="" alt="QR Code">
+          <button onclick="downloadQR()" class="btn btn-secondary">Download QR Code</button>
+        </div>
+        <div class="url-info">
+          <p><strong>Page URL:</strong></p>
+          <div class="url-box">
+            <input type="text" id="pageUrl" readonly>
+            <button onclick="copyUrl()" class="btn btn-secondary">Copy</button>
+          </div>
+          <a id="visitLink" href="" target="_blank" class="btn btn-primary">Visit Page</a>
+        </div>
+      </div>
+      <button onclick="createAnother()" class="btn btn-secondary">Create Another Gift Page</button>
+    </div>
+
+    <div class="pages-list">
+      <h2>Recent Gift Pages</h2>
+      <div id="pagesList"></div>
+    </div>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>
