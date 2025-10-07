@@ -15,6 +15,11 @@
       <h2>Create New Gift Page</h2>
       <form id="giftForm" enctype="multipart/form-data">
         <div class="form-group">
+          <label for="title">Gift Title:</label>
+          <input type="text" id="title" name="title" placeholder="Enter gift title..." required>
+        </div>
+
+        <div class="form-group">
           <label for="text">Message Text:</label>
           <textarea id="text" name="text" rows="4" placeholder="Enter your gift message here..."></textarea>
         </div>
@@ -40,7 +45,7 @@
       <div class="result-content">
         <div class="qr-container">
           <img id="qrCode" src="" alt="QR Code">
-          <button onclick="downloadQR()" class="btn btn-secondary">Download QR Code</button>
+          <button onclick="downloadQR()" class="btn btn-secondary">Download QR</button>
         </div>
         <div class="url-info">
           <p><strong>Page URL:</strong></p>
@@ -51,7 +56,7 @@
           <a id="visitLink" href="" target="_blank" class="btn btn-primary">Visit Page</a>
         </div>
       </div>
-      <button onclick="createAnother()" class="btn btn-secondary">Create Another Gift Page</button>
+      <button onclick="createAnother()" class="btn btn-secondary">Create Another</button>
     </div>
 
     <div class="pages-list">

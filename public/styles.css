@@ -1,3 +1,6 @@
+/* -------------------------------------------------
+   Global Reset & Typography
+--------------------------------------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -9,8 +12,12 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   padding: 20px;
+  color: #333;
 }
 
+/* -------------------------------------------------
+   Containers
+--------------------------------------------------- */
 .container {
   max-width: 900px;
   margin: 0 auto;
@@ -20,6 +27,9 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+/* -------------------------------------------------
+   Headings & Text
+--------------------------------------------------- */
 h1 {
   color: #333;
   font-size: 2.5em;
@@ -34,6 +44,18 @@ h1 {
   margin-bottom: 30px;
 }
 
+/* Gift Page Title */
+.gift-title {
+  font-size: 2em;
+  color: #667eea;
+  margin-bottom: 25px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* -------------------------------------------------
+   Links & Buttons
+--------------------------------------------------- */
 .back-link {
   display: inline-block;
   color: #667eea;
@@ -82,6 +104,9 @@ h1 {
   background: #e0e0e0;
 }
 
+/* -------------------------------------------------
+   Info Section
+--------------------------------------------------- */
 .info-box {
   background: #f8f9ff;
   border-radius: 10px;
@@ -104,7 +129,9 @@ h1 {
   color: #555;
 }
 
-/* Admin Form */
+/* -------------------------------------------------
+   Admin Form
+--------------------------------------------------- */
 .form-container {
   background: #f8f9ff;
   border-radius: 10px;
@@ -145,6 +172,7 @@ textarea {
   resize: vertical;
 }
 
+/* Previews */
 .preview {
   margin-top: 10px;
   min-height: 50px;
@@ -162,7 +190,9 @@ textarea {
   width: 100%;
 }
 
-/* Result */
+/* -------------------------------------------------
+   Result Section
+--------------------------------------------------- */
 .result {
   background: #e8f5e9;
   border-radius: 10px;
@@ -212,7 +242,9 @@ textarea {
   flex: 1;
 }
 
-/* Pages List */
+/* -------------------------------------------------
+   Recent Pages
+--------------------------------------------------- */
 .pages-list {
   margin-top: 40px;
   padding-top: 30px;
@@ -250,12 +282,15 @@ textarea {
   font-size: 0.9em;
 }
 
-/* Gift Page */
+/* -------------------------------------------------
+   Gift Page
+--------------------------------------------------- */
 .gift-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
 .gift-content {
@@ -307,7 +342,9 @@ textarea {
   padding: 40px;
 }
 
-/* Responsive */
+/* -------------------------------------------------
+   Responsive Design
+--------------------------------------------------- */
 @media (max-width: 768px) {
   .container,
   .gift-content {
