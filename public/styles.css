@@ -307,10 +307,6 @@ textarea {
   padding: 40px;
 }
 
-<<<<<<< HEAD
-/* -------------------------------------------------
-   Loading Spinner
---------------------------------------------------- */
 .loading-spinner {
   display: flex;
   align-items: center;
@@ -356,9 +352,7 @@ textarea {
 /* -------------------------------------------------
    Responsive Design
 --------------------------------------------------- */
-=======
-/* Responsive */
->>>>>>> 71bb75f7602708e367765ef468c0b40b854e2aae
+
 @media (max-width: 768px) {
   .container,
   .gift-content {
