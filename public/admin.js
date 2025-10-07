@@ -1,28 +1,66 @@
 // Preview uploaded image
 document.getElementById('image').addEventListener('change', e => {
   const preview = document.getElementById('imagePreview');
+  const progress = document.getElementById('imageUploadProgress');
   const file = e.target.files[0];
-  if (!file) return (preview.innerHTML = '');
+  
+  if (!file) {
+    preview.innerHTML = '';
+    progress.style.display = 'none';
+    return;
+  }
+  
+  progress.style.display = 'block';
   const reader = new FileReader();
+  
   reader.onload = ev => {
     preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+    progress.style.display = 'none';
   };
+  
+  reader.onerror = () => {
+    progress.style.display = 'none';
+    alert('Error reading image file');
+  };
+  
   reader.readAsDataURL(file);
 });
 
 // Preview uploaded audio
 document.getElementById('audio').addEventListener('change', e => {
   const preview = document.getElementById('audioPreview');
+  const progress = document.getElementById('audioUploadProgress');
   const file = e.target.files[0];
-  if (!file) return (preview.innerHTML = '');
-  const url = URL.createObjectURL(file);
-  preview.innerHTML = `<audio controls><source src="${url}" type="audio/mpeg"></audio>`;
+  
+  if (!file) {
+    preview.innerHTML = '';
+    progress.style.display = 'none';
+    return;
+  }
+  
+  progress.style.display = 'block';
+  
+  // Show progress briefly then show audio player
+  setTimeout(() => {
+    const url = URL.createObjectURL(file);
+    preview.innerHTML = `<audio controls><source src="${url}" type="audio/mpeg"></audio>`;
+    progress.style.display = 'none';
+  }, 500);
 });
 
 // Submit form
 document.getElementById('giftForm').addEventListener('submit', async e => {
   e.preventDefault();
   const formData = new FormData(e.target);
+
+  // Show loading state
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  
+  submitBtn.disabled = true;
+  btnText.style.display = 'none';
+  loadingSpinner.style.display = 'flex';
 
   try {
     const res = await fetch('/api/create', { method: 'POST', body: formData });
@@ -36,9 +74,16 @@ document.getElementById('giftForm').addEventListener('submit', async e => {
       document.querySelector('.form-container').style.display = 'none';
       document.getElementById('result').style.display = 'block';
       loadPages();
-    } else alert('Error creating page: ' + result.error);
+    } else {
+      alert('Error creating page: ' + result.error);
+    }
   } catch (err) {
     alert('Error: ' + err.message);
+  } finally {
+    // Reset button state
+    submitBtn.disabled = false;
+    btnText.style.display = 'inline';
+    loadingSpinner.style.display = 'none';
   }
 });
 
@@ -63,6 +108,17 @@ function createAnother() {
   document.getElementById('result').style.display = 'none';
   document.getElementById('imagePreview').innerHTML = '';
   document.getElementById('audioPreview').innerHTML = '';
+  document.getElementById('imageUploadProgress').style.display = 'none';
+  document.getElementById('audioUploadProgress').style.display = 'none';
+  
+  // Reset button state
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  
+  submitBtn.disabled = false;
+  btnText.style.display = 'inline';
+  loadingSpinner.style.display = 'none';
 }
 
 async function loadPages() {

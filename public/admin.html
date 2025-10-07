@@ -27,16 +27,24 @@
         <div class="form-group">
           <label for="image">Upload Image:</label>
           <input type="file" id="image" name="image" accept="image/*">
+          <div id="imageUploadProgress" class="upload-progress">Processing image...</div>
           <div id="imagePreview" class="preview"></div>
         </div>
 
         <div class="form-group">
           <label for="audio">Upload Audio (MP3):</label>
           <input type="file" id="audio" name="audio" accept="audio/*">
+          <div id="audioUploadProgress" class="upload-progress">Processing audio...</div>
           <div id="audioPreview" class="preview"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Generate Gift Page & QR Code</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <span id="btnText">Generate Gift Page & QR Code</span>
+          <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+            <span>Processing...</span>
+          </div>
+        </button>
       </form>
     </div>
 

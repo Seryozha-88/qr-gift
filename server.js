@@ -1,9 +1,13 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const QRCode = require('qrcode');
-const { v4: uuidv4 } = require('uuid');
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import QRCode from 'qrcode';
+import { v4 as uuidv4 } from 'uuid';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -68,8 +72,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/admin', (req, res) => {
+// Secure admin panel with hash
+const ADMIN_HASH = 'a7f9c2e8d1b4f6a3e9c7d2b8f5a1e6c9'; // Change this to your own secure hash
+
+app.get(`/admin/${ADMIN_HASH}`, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Redirect old admin route for security
+app.get('/admin', (req, res) => {
+  res.status(404).send('Not Found');
 });
 
 // Create new gift page
@@ -79,10 +91,11 @@ app.post('/api/create', upload.fields([
 ]), async (req, res) => {
   try {
     const pageId = uuidv4();
-    const { text } = req.body;
+    const { title, text } = req.body;
     
     const pageData = {
       id: pageId,
+      title: title || '',
       text: text || '',
       image: req.files['image'] ? req.files['image'][0].filename : null,
       audio: req.files['audio'] ? req.files['audio'][0].filename : null,
@@ -115,6 +128,7 @@ app.get('/api/gift/:id', (req, res) => {
     res.json({
       success: true,
       data: {
+        title: pageData.title || '',
         text: pageData.text,
         image: pageData.image ? `/uploads/images/${pageData.image}` : null,
         audio: pageData.audio ? `/uploads/audio/${pageData.audio}` : null
@@ -138,6 +152,7 @@ app.get('/gift/:id', (req, res) => {
 app.get('/api/pages', (req, res) => {
   const pageList = Object.values(pages).map(page => ({
     id: page.id,
+    title: page.title || 'Untitled',
     text: page.text.substring(0, 50) + (page.text.length > 50 ? '...' : ''),
     hasImage: !!page.image,
     hasAudio: !!page.audio,
@@ -148,6 +163,6 @@ app.get('/api/pages', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`QR Gift server running on port ${PORT}`);
-  console.log(`Admin panel: /admin`);
+  console.log(`Admin panel: /admin/${ADMIN_HASH}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
