@@ -24,7 +24,7 @@ app.get('/health', (req, res) => {
 });
 
 // Create necessary directories
-['uploads/images', 'uploads/audio', 'data'].forEach(dir => {
+['uploads/images', 'uploads/audio', 'data', 'backups'].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -65,6 +65,83 @@ if (fs.existsSync(dataFile)) {
 
 function savePages() {
   fs.writeFileSync(dataFile, JSON.stringify(pages, null, 2));
+  // Create backup with timestamp
+  createBackup();
+}
+
+// Backup function
+function createBackup() {
+  try {
+    const timestamp = new Date().toISOString().replace(/:/g, '-');
+    const backupDir = `backups/backup_${timestamp}`;
+    
+    // Create backup directory
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+    
+    // Backup pages.json
+    fs.writeFileSync(
+      path.join(backupDir, 'pages.json'),
+      JSON.stringify(pages, null, 2)
+    );
+    
+    // Backup uploaded files
+    const imagesBackup = path.join(backupDir, 'images');
+    const audioBackup = path.join(backupDir, 'audio');
+    
+    if (!fs.existsSync(imagesBackup)) fs.mkdirSync(imagesBackup, { recursive: true });
+    if (!fs.existsSync(audioBackup)) fs.mkdirSync(audioBackup, { recursive: true });
+    
+    // Copy all uploaded files
+    Object.values(pages).forEach(page => {
+      if (page.image) {
+        const src = path.join('uploads/images', page.image);
+        const dest = path.join(imagesBackup, page.image);
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dest);
+        }
+      }
+      if (page.audio) {
+        const src = path.join('uploads/audio', page.audio);
+        const dest = path.join(audioBackup, page.audio);
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dest);
+        }
+      }
+    });
+    
+    console.log(`Backup created: ${backupDir}`);
+    
+    // Keep only last 10 backups
+    cleanOldBackups();
+  } catch (error) {
+    console.error('Backup error:', error);
+  }
+}
+
+// Clean old backups
+function cleanOldBackups() {
+  try {
+    const backups = fs.readdirSync('backups')
+      .filter(file => file.startsWith('backup_'))
+      .map(file => ({
+        name: file,
+        path: path.join('backups', file),
+        time: fs.statSync(path.join('backups', file)).mtime.getTime()
+      }))
+      .sort((a, b) => b.time - a.time);
+    
+    // Keep only last 10 backups
+    if (backups.length > 10) {
+      backups.slice(10).forEach(backup => {
+        fs.rmSync(backup.path, { recursive: true, force: true });
+        console.log(`Deleted old backup: ${backup.name}`);
+      });
+    }
+  } catch (error) {
+    console.error('Error cleaning backups:', error);
+  }
 }
 
 // Routes
@@ -161,8 +238,82 @@ app.get('/api/pages', (req, res) => {
   res.json({ success: true, pages: pageList });
 });
 
+// Delete page endpoint
+app.delete('/api/pages/:id', (req, res) => {
+  try {
+    const pageId = req.params.id;
+    const page = pages[pageId];
+    
+    if (!page) {
+      return res.status(404).json({ success: false, error: 'Page not found' });
+    }
+    
+    // Delete associated files
+    if (page.image) {
+      const imagePath = path.join('uploads/images', page.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+    
+    if (page.audio) {
+      const audioPath = path.join('uploads/audio', page.audio);
+      if (fs.existsSync(audioPath)) {
+        fs.unlinkSync(audioPath);
+      }
+    }
+    
+    // Delete page data
+    delete pages[pageId];
+    savePages();
+    
+    res.json({ success: true, message: 'Page deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting page:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get backup list
+app.get('/api/backups', (req, res) => {
+  try {
+    const backups = fs.readdirSync('backups')
+      .filter(file => file.startsWith('backup_'))
+      .map(file => ({
+        name: file,
+        date: fs.statSync(path.join('backups', file)).mtime,
+        size: getDirectorySize(path.join('backups', file))
+      }))
+      .sort((a, b) => b.date - a.date);
+    
+    res.json({ success: true, backups });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Helper function to get directory size
+function getDirectorySize(dirPath) {
+  let size = 0;
+  const files = fs.readdirSync(dirPath);
+  
+  files.forEach(file => {
+    const filePath = path.join(dirPath, file);
+    const stats = fs.statSync(filePath);
+    if (stats.isDirectory()) {
+      size += getDirectorySize(filePath);
+    } else {
+      size += stats.size;
+    }
+  });
+  
+  return size;
+}
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`QR Gift server running on port ${PORT}`);
   console.log(`Admin panel: /admin/${ADMIN_HASH}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Pages will persist until manually deleted`);
+  console.log(`Backups stored in: backups/`);
 });
