@@ -10,3 +10,9 @@ node_modules/
 .env
 npm-debug.log
 .dockerignore
+
+# Local runtime data (gifts, uploads, backups) must not be uploaded
+uploads/
+data/
+backups/
+docs/

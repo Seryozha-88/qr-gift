@@ -1,3 +1,7 @@
+// The admin key is the last segment of this page's URL (/admin/<key>)
+const ADMIN_KEY = window.location.pathname.split('/').pop();
+const adminHeaders = { 'X-Admin-Key': ADMIN_KEY };
+
 // Preview uploads
 document.getElementById('image').addEventListener('change', function(e) {
   const preview = document.getElementById('imagePreview');
@@ -64,6 +68,7 @@ document.getElementById('giftForm').addEventListener('submit', async function(e)
   try {
     const response = await fetch('/api/create', {
       method: 'POST',
+      headers: adminHeaders,
       body: formData
     });
     
@@ -72,7 +77,8 @@ document.getElementById('giftForm').addEventListener('submit', async function(e)
     if (result.success) {
       document.getElementById('qrCode').src = result.qrCode;
       document.getElementById('pageUrl').value = result.url;
-      document.getElementById('visitLink').href = result.url;
+      document.getElementById('visitLink').href = result.previewUrl;
+      document.getElementById('publishHint').style.display = result.needsPublish ? 'block' : 'none';
       
       document.querySelector('.form-container').style.display = 'none';
       document.getElementById('result').style.display = 'block';
@@ -128,7 +134,7 @@ function createAnother() {
 // Load recent pages
 async function loadPages() {
   try {
-    const response = await fetch('/api/pages');
+    const response = await fetch('/api/pages', { headers: adminHeaders });
     const result = await response.json();
     
     if (result.success) {
@@ -151,7 +157,7 @@ async function loadPages() {
               Created: ${new Date(page.createdAt).toLocaleString()}
             </p>
           </div>
-          <a href="/gift/${page.id}" target="_blank" class="btn btn-secondary">View Page</a>
+          <a href="/gift/${page.id}/" target="_blank" class="btn btn-secondary">View Page</a>
         </div>
       `).join('');
     }

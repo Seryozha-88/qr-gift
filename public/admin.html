@@ -56,7 +56,8 @@
             <input type="text" id="pageUrl" readonly>
             <button onclick="copyUrl()" class="btn btn-secondary">Copy</button>
           </div>
-          <a id="visitLink" href="" target="_blank" class="btn btn-primary">Visit Page</a>
+          <a id="visitLink" href="" target="_blank" class="btn btn-primary">Preview Page</a>
+          <p id="publishHint" style="display: none;">The QR code works once you publish: run <code>npm run deploy</code>.</p>
         </div>
       </div>
       <button onclick="createAnother()" class="btn btn-secondary">Create Another Gift Page</button>
