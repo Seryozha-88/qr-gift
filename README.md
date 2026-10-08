@@ -35,11 +35,12 @@ npm run admin
 ```bash
 npm run deploy
 ```
-   This regenerates `docs/` from your gifts, commits it and pushes. The site updates about a minute later.
+   This adds your new gifts to `docs/`, commits, pulls gifts others published, and pushes. The site updates about a minute later.
 
 **Everything in `docs/` is public**: anyone can browse the repository and see every published gift.
-Gifts live locally in `data/` and `uploads/`, which are not committed; back them up yourself.
-To remove a gift from the site, delete it, then run `npm run deploy` again. It remains in the git history.
+Each computer keeps its own gifts in `data/` and `uploads/` (not committed); gifts published from other computers are never removed by your deploy.
+To remove a gift, click Delete in the admin panel on the computer that created it, then run `npm run deploy`. It remains in the git history.
+Other admins can publish too: give them write access to the repository, and they follow the same steps on their own computer.
 
 One-time setup: in the repository's Settings → Pages, set Source to "Deploy from a branch", choose the branch and the `/docs` folder.
 

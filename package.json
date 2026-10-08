@@ -7,7 +7,7 @@
     "start": "node server.js",
     "admin": "PUBLIC_URL=https://seryozha-88.github.io/qr-gift node server.js",
     "export": "node export.js",
-    "deploy": "node export.js && git add docs && git commit -m \"Publish gift pages\" && git push"
+    "deploy": "node export.js && git add docs && git commit -m \"Publish gift pages\" && git pull --rebase --autostash && git push"
   },
   "dependencies": {
     "express": "^4.21.2",

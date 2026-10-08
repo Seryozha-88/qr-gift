@@ -85,6 +85,17 @@ function savePages() {
   createBackup();
 }
 
+// Deleted gift ids, so export.js also takes them off the published site
+const removedFile = path.join(DATA_DIR, 'removed.json');
+
+function recordRemoval(pageId) {
+  const removed = fs.existsSync(removedFile) ? JSON.parse(fs.readFileSync(removedFile, 'utf8')) : [];
+  if (!removed.includes(pageId)) {
+    removed.push(pageId);
+    fs.writeFileSync(removedFile, JSON.stringify(removed, null, 2));
+  }
+}
+
 // Backup function
 function createBackup() {
   try {
@@ -291,7 +302,8 @@ app.delete('/api/pages/:id', requireAdmin, (req, res) => {
     // Delete page data
     delete pages[pageId];
     savePages();
-    
+    recordRemoval(pageId);
+
     res.json({ success: true, message: 'Page deleted successfully' });
   } catch (error) {
     console.error('Error deleting page:', error);

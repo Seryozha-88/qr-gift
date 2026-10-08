@@ -157,13 +157,29 @@ async function loadPages() {
               Created: ${new Date(page.createdAt).toLocaleString()}
             </p>
           </div>
-          <a href="/gift/${page.id}/" target="_blank" class="btn btn-secondary">View Page</a>
+          <div>
+            <a href="/gift/${page.id}/" target="_blank" class="btn btn-secondary">View Page</a>
+            <button onclick="deleteGift('${page.id}')" class="btn btn-secondary">Delete</button>
+          </div>
         </div>
       `).join('');
     }
   } catch (error) {
     console.error('Error loading pages:', error);
   }
+}
+
+// Delete a gift; it leaves the published site on the next deploy
+async function deleteGift(pageId) {
+  if (!confirm('Delete this gift? Its QR code stops working after the next deploy.')) {
+    return;
+  }
+  const response = await fetch(`/api/pages/${pageId}`, { method: 'DELETE', headers: adminHeaders });
+  const result = await response.json();
+  if (!result.success) {
+    alert('Error deleting gift: ' + result.error);
+  }
+  loadPages();
 }
 
 // Load pages on page load
