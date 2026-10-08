@@ -34,6 +34,8 @@ for (const file of ['index.html', 'styles.css', 'gift.js']) {
 }
 fs.writeFileSync(path.join(SITE_DIR, '.nojekyll'), '');
 const giftHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'gift.html'));
+// The browser admin (docs/admin/) copies this template into each gift it creates
+fs.writeFileSync(path.join(SITE_DIR, 'gift-template.html'), giftHtml);
 
 function copyMedia(file, subdir, allowedExts, giftDir, pageId) {
   if (!file) {
@@ -65,7 +67,8 @@ for (const page of giftList) {
     title: page.title || '',
     text: page.text || '',
     image: copyMedia(page.image, 'images', IMAGE_EXTS, giftDir, page.id),
-    audio: copyMedia(page.audio, 'audio', AUDIO_EXTS, giftDir, page.id)
+    audio: copyMedia(page.audio, 'audio', AUDIO_EXTS, giftDir, page.id),
+    createdAt: page.createdAt
   };
   fs.writeFileSync(path.join(giftDir, 'gift.json'), JSON.stringify(giftData));
 }

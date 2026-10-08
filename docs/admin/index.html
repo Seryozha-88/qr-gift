@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="robots" content="noindex">
+  <title>Gift Admin - QR Gift Generator</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Gift Admin</h1>
+
+    <section id="signIn" class="form-container" hidden>
+      <h2>Sign in with GitHub</h2>
+      <p>You only need to do this once on each device.</p>
+      <ol class="steps">
+        <li>Ask the shop owner to add your GitHub account to the <code>qr-gift</code> repository, then accept the invitation email.</li>
+        <li><a href="https://github.com/settings/tokens/new?scopes=public_repo&amp;description=QR%20Gift%20admin" target="_blank" rel="noopener">Create a token on GitHub</a>: keep <strong>public_repo</strong> ticked, choose an expiration, click <em>Generate token</em> and copy it.</li>
+        <li>Paste it below.</li>
+      </ol>
+      <form id="signInForm">
+        <div class="form-group">
+          <label for="token">GitHub token</label>
+          <input type="password" id="token" autocomplete="off" required placeholder="ghp_...">
+        </div>
+        <label class="checkbox"><input type="checkbox" id="remember" checked> Remember me on this device</label>
+        <button type="submit" class="btn btn-primary" id="signInBtn">Sign in</button>
+      </form>
+      <p id="signInError" class="error-text" hidden></p>
+    </section>
+
+    <section id="app" hidden>
+      <p class="signed-in">Signed in as <strong id="login"></strong> · <button type="button" id="signOut" class="link-button">Sign out</button></p>
+
+      <div class="form-container" id="formContainer">
+        <h2>Create New Gift</h2>
+        <form id="giftForm">
+          <div class="form-group">
+            <label for="text">Message Text:</label>
+            <textarea id="text" rows="4" placeholder="Enter the gift message here..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="image">Image (JPG, PNG, GIF or WebP, up to 25 MB):</label>
+            <input type="file" id="image" accept=".jpg,.jpeg,.png,.gif,.webp">
+            <div id="imagePreview" class="preview"></div>
+          </div>
+          <div class="form-group">
+            <label for="audio">Audio (MP3, M4A, AAC, OGG or WAV, up to 25 MB):</label>
+            <input type="file" id="audio" accept=".mp3,.m4a,.aac,.ogg,.wav">
+            <div id="audioPreview" class="preview"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Create Gift &amp; QR Code</button>
+          <p id="formError" class="error-text" hidden></p>
+        </form>
+      </div>
+
+      <div id="result" class="result" hidden>
+        <h2>✅ Gift Created!</h2>
+        <div class="result-content">
+          <div class="qr-container">
+            <img id="qrCode" src="" alt="QR Code">
+            <button type="button" id="downloadQr" class="btn btn-secondary">Download QR Code</button>
+          </div>
+          <div class="url-info">
+            <p><strong>Gift URL:</strong></p>
+            <div class="url-box">
+              <input type="text" id="giftUrl" readonly>
+              <button type="button" id="copyUrl" class="btn btn-secondary">Copy</button>
+            </div>
+            <p id="publishStatus" class="publish-status"></p>
+            <a id="openGift" href="" target="_blank" rel="noopener" class="btn btn-primary">Open Gift</a>
+          </div>
+        </div>
+        <button type="button" id="createAnother" class="btn btn-secondary">Create Another Gift</button>
+      </div>
+
+      <div class="pages-list">
+        <h2>Gifts on the Site</h2>
+        <p id="usage" class="usage"></p>
+        <div id="giftList"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="qrcode.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
