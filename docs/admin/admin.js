@@ -140,7 +140,12 @@ function validateFile(file, allowedExts, label) {
   }
 }
 
-async function createGift(text, image, audio) {
+async function uploadBlob(content) {
+  return (await post('/git/blobs', { content: await fileToBase64(content), encoding: 'base64' })).sha;
+}
+
+// video is the result of GiftVideo.prepareVideo (an MP4 and its poster frame), or null
+async function createGift(text, style, image, audio, video) {
   const templateResponse = await fetch('../gift-template.html', { cache: 'no-store' });
   if (!templateResponse.ok) {
     throw new Error('Could not load the gift page template from the site.');
@@ -149,17 +154,24 @@ async function createGift(text, image, audio) {
 
   const id = crypto.randomUUID();
   const dir = `docs/gift/${id}`;
-  const giftData = { title: '', text, image: null, audio: null, createdAt: new Date().toISOString() };
+  const giftData = { title: '', text, style, image: null, video: null, poster: null, audio: null, createdAt: new Date().toISOString() };
   const entries = [];
+  const addFile = async (kind, content, name) => {
+    entries.push({ path: `${dir}/${name}`, mode: '100644', type: 'blob', sha: await uploadBlob(content) });
+    giftData[kind] = name;
+  };
 
   for (const [kind, file] of [['image', image], ['audio', audio]]) {
-    if (!file) {
-      continue;
+    if (file) {
+      await addFile(kind, file, crypto.randomUUID() + extensionOf(file.name));
     }
-    const name = crypto.randomUUID() + extensionOf(file.name);
-    const blob = await post('/git/blobs', { content: await fileToBase64(file), encoding: 'base64' });
-    entries.push({ path: `${dir}/${name}`, mode: '100644', type: 'blob', sha: blob.sha });
-    giftData[kind] = name;
+  }
+  if (video) {
+    const name = crypto.randomUUID();
+    await addFile('video', video.video, `${name}.mp4`);
+    if (video.poster) {
+      await addFile('poster', video.poster, `${name}.jpg`);
+    }
   }
   entries.push({ path: `${dir}/index.html`, mode: '100644', type: 'blob', content: template });
   entries.push({ path: `${dir}/gift.json`, mode: '100644', type: 'blob', content: JSON.stringify(giftData) });
@@ -209,7 +221,7 @@ function giftItem(gift) {
   const preview = (gift.text || '').slice(0, 80);
   text.textContent = preview ? `${preview}${gift.text.length > 80 ? '…' : ''}` : 'No text';
   const media = document.createElement('p');
-  media.textContent = [gift.image && '🖼️ Image', gift.audio && '🎵 Audio', !gift.published && '⏳ Publishing'].filter(Boolean).join('  ');
+  media.textContent = [gift.image && '🖼️ Image', gift.video && '🎬 Video', gift.audio && '🎵 Audio', !gift.published && '⏳ Publishing'].filter(Boolean).join('  ');
   const created = document.createElement('p');
   created.style.fontSize = '0.9em';
   created.style.color = '#999';
@@ -377,23 +389,118 @@ $('signOut').addEventListener('click', () => {
 $('image').addEventListener('change', event => showPreview(event.target, 'imagePreview', 'img'));
 $('audio').addEventListener('change', event => showPreview(event.target, 'audioPreview', 'audio'));
 
+// Message style controls, previewed with the same rules the gift page uses
+function fillSelect(select, options, selected) {
+  for (const [value, { label }] of Object.entries(options)) {
+    select.append(new Option(label, value, value === selected, value === selected));
+  }
+}
+
+function currentStyle() {
+  return {
+    font: $('styleFont').value,
+    size: $('styleSize').value,
+    color: $('styleColor').value,
+    bold: $('styleBold').checked,
+    italic: $('styleItalic').checked,
+    align: $('styleAlign').value
+  };
+}
+
+function updateTextPreview() {
+  const preview = $('textPreview');
+  preview.textContent = $('text').value.trim() || 'Your message will look like this';
+  window.GiftPage.applyTextStyle(preview, currentStyle());
+  $('fontNote').hidden = $('styleFont').value !== 'handwritten';
+}
+
+fillSelect($('styleFont'), window.GiftPage.TEXT_FONTS, 'standard');
+fillSelect($('styleSize'), window.GiftPage.TEXT_SIZES, 'medium');
+for (const id of ['text', 'styleFont', 'styleSize', 'styleColor', 'styleBold', 'styleItalic', 'styleAlign']) {
+  $(id).addEventListener('input', updateTextPreview);
+  $(id).addEventListener('change', updateTextPreview);
+}
+updateTextPreview();
+
+// Videos are converted as soon as they are picked, so staff see the result before creating the gift
+let preparedVideo = null;
+let videoJob = 0;
+
+function setVideoStatus(message, isError) {
+  const status = $('videoStatus');
+  status.textContent = message;
+  status.hidden = !message;
+  status.classList.toggle('error-text', Boolean(isError));
+}
+
+function resetVideo() {
+  videoJob++;
+  preparedVideo = null;
+  $('videoPreview').replaceChildren();
+  setVideoStatus('');
+  $('submitBtn').disabled = false;
+}
+
+$('video').addEventListener('change', async event => {
+  resetVideo();
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+  const job = videoJob;
+  $('submitBtn').disabled = true;
+  setVideoStatus('Preparing the video…');
+  try {
+    const result = await window.GiftVideo.prepareVideo(file, progress => {
+      if (job === videoJob) {
+        setVideoStatus(`Converting the video… ${Math.round(progress * 100)}%`);
+      }
+    });
+    if (job !== videoJob) {
+      return;
+    }
+    preparedVideo = result;
+    const sizeMb = (result.video.size / 1024 ** 2).toFixed(1);
+    setVideoStatus(`✅ Video ready: ${Math.round(result.duration)} s, ${sizeMb} MB${result.converted ? ', converted to play on every phone' : ''}.`);
+    const player = document.createElement('video');
+    player.src = URL.createObjectURL(result.video);
+    player.controls = true;
+    player.playsInline = true;
+    if (result.poster) {
+      player.poster = URL.createObjectURL(result.poster);
+    }
+    $('videoPreview').replaceChildren(player);
+  } catch (error) {
+    if (job === videoJob) {
+      console.error('Video preparation failed:', error);
+      setVideoStatus(error.message, true);
+      $('video').value = '';
+    }
+  } finally {
+    if (job === videoJob) {
+      $('submitBtn').disabled = false;
+    }
+  }
+});
+
 $('giftForm').addEventListener('submit', async event => {
   event.preventDefault();
   const text = $('text').value.trim();
   const image = $('image').files[0];
   const audio = $('audio').files[0];
+  const video = preparedVideo;
   const formError = $('formError');
   const button = $('submitBtn');
   formError.hidden = true;
   try {
-    if (!text && !image && !audio) {
-      throw new Error('Add a message, an image or an audio file.');
+    if (!text && !image && !audio && !video) {
+      throw new Error('Add a message, an image, a video or an audio file.');
     }
     validateFile(image, IMAGE_EXTS, 'The image');
     validateFile(audio, AUDIO_EXTS, 'The audio');
     button.disabled = true;
     button.textContent = 'Uploading…';
-    const id = await createGift(text, image, audio);
+    const id = await createGift(text, currentStyle(), image, audio, video);
     $('qrCode').src = await qrDataUrl(id);
     $('giftUrl').value = giftUrl(id);
     $('openGift').href = giftUrl(id);
@@ -419,6 +526,8 @@ $('copyUrl').addEventListener('click', async () => {
 
 $('createAnother').addEventListener('click', () => {
   $('giftForm').reset();
+  resetVideo();
+  updateTextPreview();
   $('imagePreview').replaceChildren();
   $('audioPreview').replaceChildren();
   $('result').hidden = true;

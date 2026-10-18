@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'">
   <meta name="robots" content="noindex">
   <title>Gift Admin - QR Gift Generator</title>
   <link rel="stylesheet" href="../styles.css">
@@ -11,7 +11,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎁 Gift Admin</h1>
+    <h1>Gift Admin</h1>
 
     <section id="signIn" class="form-container" hidden>
       <h2>Sign in with GitHub</h2>
@@ -43,9 +43,32 @@
             <textarea id="text" rows="4" placeholder="Enter the gift message here..."></textarea>
           </div>
           <div class="form-group">
+            <label>Text Style:</label>
+            <div class="style-row">
+              <select id="styleFont" aria-label="Font"></select>
+              <select id="styleSize" aria-label="Size"></select>
+              <input type="color" id="styleColor" value="#333333" aria-label="Colour" title="Colour">
+              <label class="toggle" title="Bold"><input type="checkbox" id="styleBold"> <strong>B</strong></label>
+              <label class="toggle" title="Italic"><input type="checkbox" id="styleItalic"> <em>I</em></label>
+              <select id="styleAlign" aria-label="Alignment">
+                <option value="left">Left</option>
+                <option value="center" selected>Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+            <p id="fontNote" class="hint" hidden>No handwritten font has Armenian letters, so Armenian text is shown in the Modern font.</p>
+            <div id="textPreview" class="text-content text-preview"></div>
+          </div>
+          <div class="form-group">
             <label for="image">Image (JPG, PNG, GIF or WebP, up to 25 MB):</label>
             <input type="file" id="image" accept=".jpg,.jpeg,.png,.gif,.webp">
             <div id="imagePreview" class="preview"></div>
+          </div>
+          <div class="form-group">
+            <label for="video">Video (from iPhone, Android or a computer, up to 3 minutes):</label>
+            <input type="file" id="video" accept="video/*,.mov,.mp4,.m4v,.webm,.mkv,.3gp,.avi">
+            <p id="videoStatus" class="hint" hidden></p>
+            <div id="videoPreview" class="preview"></div>
           </div>
           <div class="form-group">
             <label for="audio">Audio (MP3, M4A, AAC, OGG or WAV, up to 25 MB):</label>
@@ -86,6 +109,8 @@
   </div>
 
   <script src="qrcode.min.js"></script>
+  <script src="../gift.js"></script>
+  <script src="video.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

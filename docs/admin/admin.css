@@ -69,3 +69,58 @@ input[type="password"]:focus {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.style-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.style-row select,
+.style-row input[type="color"] {
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+
+.style-row input[type="color"] {
+  width: 48px;
+  height: 40px;
+  padding: 2px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.hint {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 8px;
+}
+
+.text-preview {
+  margin: 12px 0 0;
+  padding: 16px;
+  min-height: 60px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.preview video {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+}

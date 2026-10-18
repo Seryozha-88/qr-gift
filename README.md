@@ -28,7 +28,15 @@ Open the admin page in any browser, on a computer or a phone:
    your GitHub account must be added to this repository, and the token is a
    *classic* token with only `public_repo` ticked. Fine-grained tokens do not work
    for collaborators on a personal account's repository.
-2. Write the message, add an image and/or audio, and click **Create Gift & QR Code**.
+2. Write the message and choose its style (font, size, colour, bold, italic, alignment; the preview shows the result).
+   Add an image, a video and/or audio, and click **Create Gift & QR Code**.
+   - Fonts: Standard, Modern and Classic include Armenian, Latin and Cyrillic letters. Handwritten has no Armenian
+     letters (no handwritten web font does), so Armenian text in it is shown in Modern.
+   - Videos up to 3 minutes from iPhone (.mov, HEVC), Android (.mp4, .3gp, .webm) or a computer (.mp4, .mov, .webm, .mkv)
+     are converted in the browser to an MP4 that plays on every phone (H.264 video up to 720p, AAC audio, at most 25 MB),
+     with a poster frame. H.264 videos that already fit are kept as they are. Conversion uses the device's video hardware;
+     if a device cannot convert a video, the page says so: try the phone the video was recorded with, or set the iPhone
+     camera to *Settings → Camera → Formats → Most Compatible*.
 3. Download the QR code. It starts working about a minute later; the page shows ✅ Live when it does.
 4. The list below the form shows every gift on the site, with buttons to open it, download its QR code again, or delete it.
 
@@ -74,13 +82,15 @@ qr-gift/
 ├── server.js           # Express server (admin panel and local preview)
 ├── export.js           # Builds the static GitHub Pages site into docs/
 ├── docs/               # Published site; docs/admin/ is the staff admin page
+│                       #   docs/admin/mediabunny*.js: video conversion (Mediabunny, MPL-2.0)
 ├── package.json        # Dependencies
 ├── public/            # Static files
 │   ├── index.html     # Home page
 │   ├── admin.html     # Admin panel
 │   ├── gift.html      # Gift page template
 │   ├── admin.js       # Admin panel logic
-│   ├── gift.js        # Gift page logic
+│   ├── gift.js        # Gift page logic and message styles (shared with docs/admin/)
+│   ├── fonts.css      # Self-hosted message fonts (Noto Sans/Serif + Armenian, Caveat; SIL OFL)
 │   └── styles.css     # Styling
 ├── uploads/           # Uploaded files (created automatically)
 │   ├── images/

@@ -29,9 +29,10 @@ fs.mkdirSync(GIFTS_DIR, { recursive: true });
 for (const pageId of removed) {
   fs.rmSync(path.join(GIFTS_DIR, path.basename(pageId)), { recursive: true, force: true });
 }
-for (const file of ['index.html', 'styles.css', 'gift.js']) {
+for (const file of ['index.html', 'styles.css', 'fonts.css', 'gift.js']) {
   fs.copyFileSync(path.join(PUBLIC_DIR, file), path.join(SITE_DIR, file));
 }
+fs.cpSync(path.join(PUBLIC_DIR, 'fonts'), path.join(SITE_DIR, 'fonts'), { recursive: true });
 fs.writeFileSync(path.join(SITE_DIR, '.nojekyll'), '');
 const giftHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'gift.html'));
 // The browser admin (docs/admin/) copies this template into each gift it creates
